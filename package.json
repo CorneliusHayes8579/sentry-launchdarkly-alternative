@@ -1,0 +1,11 @@
+{
+  "name": "sentry-launchdarkly-alternative",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=18" },
+  "devDependencies": {
+    "tsx": "^4",
+    "@sentry/node": "^8",
+    "launchdarkly-node-server-sdk": "^7"
+  }
+}
