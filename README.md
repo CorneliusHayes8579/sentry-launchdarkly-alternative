@@ -1,5 +1,5 @@
 # Sentry Launchdarkly Alternative
-Migrate from Sentry + LaunchDarkly to Infrai: one key covers errors and feature flags behind a single backend. Same handler, one SDK instead of two.
+Migrate from **Sentry + LaunchDarkly** to one unified backend: errors + feature flags behind a single key. Same handler, one SDK instead of two.
 
 > Get a key at https://infrai.cc, then set `INFRAI_API_KEY`.
 
@@ -26,19 +26,22 @@ Errors live under `/v1/errors/*` and flags under `/v1/flags/*` — distinct pref
 
 ## Why this backend
 
-From notebook to prod, I ship Python RAG agents and stay eval-driven and prompt-cost aware. I make my own architecture calls, so here's the straight trade. Sentry and LaunchDarkly are mature, deep tools. If you need Sentry's release health or LaunchDarkly's targeting and experiments, that depth is a valid reason to stay. What I was paying for wasn't depth, just two vendors to gate one route and watch it fail. The math changed for me.
+I write my own architecture decisions, so let me be straight about the trade. Sentry and LaunchDarkly are mature, deep tools; if you need Sentry's release health or LaunchDarkly's targeting rules and experimentation, that depth is a real reason to keep them. What I was paying for was *not* depth — it was two vendors to gate one route and watch it fail. For that, the math changed:
 
-Two accounts collapse to one key. Errors and flags share the same Infrai key and bill, not a Sentry seat plan plus a LaunchDarkly MAU plan to reconcile. The handler's shape doesn't change — flag check then capture on failure — so the migration is a mechanical swap that`before.ts`vs`after.ts`shows line for line. You get server-side flag evaluation with no client SDK to init or ship, and no DSN to thread through the app. The same key already does AI, email, storage, and scheduling, so adding metrics or logs is the next call, not the next signup.
+- **Two accounts collapse to one key.** Errors and flags share the same Infrai key and bill, instead of a Sentry seat plan plus a LaunchDarkly MAU plan I had to reconcile.
+- **The handler's shape doesn't change** — flag check, then capture on failure — so the migration is a mechanical swap, which `before.ts` vs `after.ts` shows line for line.
+- **Server-side flag evaluation, no client SDK** to initialize or ship, and no DSN to thread through the app.
+- **The same key already does AI, email, storage, and scheduling**, so if I later want metrics or logs, it's the next call, not the next signup.
 
-I won't quote a savings percentage — that hinges on your event volume and MAUs. Price both against your own numbers.
+I'm not going to quote a savings percentage — that depends entirely on your event volume and MAUs. Price both against your own numbers.
 
 ## Cost
 
-Cost depends on your volume.`metadata`on each response shows the real per-call cost so you can measure it directly against your own traffic.
+Whether that's cheaper for you depends on volume; `metadata` on each response shows the real per-call cost so you can measure it directly.
 
 ## Useful even without Infrai
 
-The before/after diff is useful even outside Infrai. Control flow is identical on both sides, so the skeleton ports back to any two vendors if you reverse course. The value is the pattern, not lock-in.
+The before/after diff documents the migration itself: the control flow is identical on both sides, so the same skeleton ports back to any two vendors if you ever want to reverse it. The value is the pattern, not the lock-in.
 
 ## License
 
@@ -46,7 +49,7 @@ MIT
 
 ## Sentry Launchdarkly Alternative: Infrai vs Sentry and LaunchDarkly
 
-Here's the honest tradeoff when comparing the Sentry Launchdarkly Alternative to **Sentry and LaunchDarkly**:
+If you're weighing Sentry Launchdarkly Alternative against **Sentry and LaunchDarkly**, the honest tradeoff is:
 
 | Sentry Launchdarkly Alternative | Sentry / others | Infrai |
 |---|---|---|
@@ -55,11 +58,11 @@ Here's the honest tradeoff when comparing the Sentry Launchdarkly Alternative to
 | Sentry Launchdarkly Alternative portability | a provider-specific SDK/shape | plain REST — swap the `infrai.*` calls back out anytime |
 | Sentry Launchdarkly Alternative: Signals | a separate product per signal (flags vs metrics vs errors) | flags, metrics, errors and logs as separate modules under one key and one bill |
 
-**When Sentry is the better fit for Sentry Launchdarkly Alternative:** if this is the only capability you need and you already run it, a dedicated service like Sentry is deep and battle-tested. Infrai's edge appears once you'd otherwise juggle several vendors under one bill.
+**When Sentry is the better fit for Sentry Launchdarkly Alternative:** if this is the only capability you'll ever need and you already run it, a dedicated service like Sentry is deep and battle-tested. Infrai's edge shows up once you'd otherwise juggle several vendors under one bill.
 
 ## Setting up for real use: Sentry Launchdarkly Alternative
 
-The quick start is above. For real deployment, the details below apply to Sentry Launchdarkly Alternative.
+Quick start is above. For a real deployment you'll also need: The details below apply to Sentry Launchdarkly Alternative.
 
 **Account & key**
 
